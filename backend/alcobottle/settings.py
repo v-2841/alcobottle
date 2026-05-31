@@ -103,6 +103,16 @@ MEDIA_URL = 'media/'
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Alcobottle API',
+    'DESCRIPTION': (
+        'API каталога алкогольных напитков: категории, производители '
+        'и товары с описанием, ценой, остатками и изображениями.'
+    ),
+    'VERSION': '1.0.0',
 }
 
 DEBUG_TOOLBAR_CONFIG = {
