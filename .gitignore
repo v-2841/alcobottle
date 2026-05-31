@@ -1,0 +1,8 @@
+.vscode/
+.env
+
+# Backend
+.venv/
+__pycache__/
+backend/data
+backend/media
