@@ -120,3 +120,45 @@ SPECTACULAR_SETTINGS = {
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
 }
+
+LOG_DIR = BASE_DIR / 'logs'
+LOG_FILE = Path(os.getenv('LOG_FILE', LOG_DIR / 'main.log'))
+LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        },
+        'telegram': {
+            'format': '%(name)s - %(levelname)s - %(message)s',
+        },
+    },
+    'handlers': {
+        'log_file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOG_FILE,
+            'maxBytes': 5 * 1024 * 1024,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'level': 'WARNING',
+        },
+        'telegram': {
+            'class': 'core.handlers.TelegramBotHandler',
+            'formatter': 'telegram',
+            'level': 'ERROR',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['log_file', 'telegram'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['log_file', 'telegram'],
+    },
+}

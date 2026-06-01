@@ -9,9 +9,26 @@ services:
         condition: service_healthy
     restart: unless-stopped
     entrypoint: /app/entrypoint.sh
+    environment:
+      LOG_FILE: /app/logs/backend.log
     volumes:
       - ./backend/static:/app/static
       - ./backend/media:/app/media
+      - ./backend/logs:/app/logs
+
+  bot:
+    image: alcobottle-backend
+    pull_policy: never
+    env_file: backend/.env
+    environment:
+      LOG_FILE: /app/logs/bot.log
+    command: python bot.py
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./backend/logs:/app/logs
 
   database:
     image: postgres:18
