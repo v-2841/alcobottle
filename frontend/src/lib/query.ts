@@ -18,7 +18,7 @@ export function parseGoodsQuery(sp: RawSearchParams): GoodsQuery {
 }
 
 /**
- * Query-строка для запросов к /api/catalog (включает ordering — серверная
+ * Query-строка для запросов к catalog-data (включает ordering — серверная
  * сортировка). Используется клиентом при смене сортировки и «Показать ещё».
  */
 export function goodsQueryToString(query: GoodsQuery): string {

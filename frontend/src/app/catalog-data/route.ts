@@ -3,6 +3,7 @@ import { getGoods } from "@/lib/api";
 import type { Sort } from "@/lib/types";
 
 // Прокси к Django: клиентская сортировка/«Показать ещё» бьют сюда (тот же origin).
+// Не используем /api/*, потому что в prod Caddy отправляет этот префикс в Django.
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const data = await getGoods({

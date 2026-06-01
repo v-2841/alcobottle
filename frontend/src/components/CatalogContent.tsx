@@ -47,7 +47,7 @@ export function CatalogContent({
       ordering: ord === "price" ? undefined : ord,
       page: nextPage,
     });
-    const res = await fetch(`/api/catalog?${qs}`);
+    const res = await fetch(`/catalog-data?${qs}`);
     if (!res.ok) throw new Error("load failed");
     return res.json();
   }
