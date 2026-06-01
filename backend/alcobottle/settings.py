@@ -97,10 +97,10 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 CSRF_TRUSTED_ORIGINS = [i.strip() for i in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if i.strip()]
 

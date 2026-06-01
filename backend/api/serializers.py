@@ -26,12 +26,17 @@ class GoodSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     manufacturer = ManufacturerSerializer(read_only=True)
     volume = serializers.SerializerMethodField(help_text='Объем, л')
+    image = serializers.SerializerMethodField(help_text='Относительный URL')
 
     @extend_schema_field(
         serializers.DecimalField(max_digits=6, decimal_places=3)
     )
     def get_volume(self, obj):
         return obj.volume.normalize()
+
+    @extend_schema_field(serializers.CharField(allow_null=True))
+    def get_image(self, obj):
+        return obj.image.url if obj.image else None
 
     class Meta:
         model = Good
