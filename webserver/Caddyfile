@@ -1,0 +1,20 @@
+:80 {
+    handle_path /static/* {
+        root * /src/backend/static
+        file_server
+    }
+
+    handle_path /media/* {
+        root * /src/backend/media
+        file_server
+    }
+
+    @django path /__debug__ /__debug__/* /api /api/* /admin /admin/*
+    handle @django {
+        reverse_proxy http://backend:8000
+    }
+
+    handle {
+        reverse_proxy http://frontend:3000
+    }
+}

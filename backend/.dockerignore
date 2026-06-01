@@ -1,0 +1,36 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+*.so
+.venv/
+venv/
+env/
+
+# Env (передаём через compose env_file)
+.env
+
+# Тесты/покрытие
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Логи
+*.log
+
+# Django (создаются/монтируются в рантайме)
+static/
+media/
+logs/
+
+# IDE
+.idea/
+.vscode/

@@ -1,0 +1,52 @@
+services:
+  backend:
+    build: ./backend
+    image: alcobottle-backend
+    pull_policy: never
+    env_file: backend/.env
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+    entrypoint: /app/entrypoint.sh
+    volumes:
+      - ./backend/static:/app/static
+      - ./backend/media:/app/media
+
+  database:
+    image: postgres:18
+    restart: unless-stopped
+    env_file: backend/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1 -p 5432"]
+      interval: 15s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  frontend:
+    build: ./frontend
+    image: alcobottle-frontend
+    pull_policy: never
+    env_file: frontend/.env
+    restart: unless-stopped
+
+  webserver:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:8011:80
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./backend/static:/src/backend/static
+      - ./backend/media:/src/backend/media
+      - ./webserver:/etc/caddy
+      - caddy_data:/data
+
+volumes:
+  postgres_data:
+  caddy_data:

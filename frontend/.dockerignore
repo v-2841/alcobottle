@@ -1,0 +1,16 @@
+node_modules
+.next
+.git
+.gitignore
+.vscode
+.idea
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+coverage
+*.tsbuildinfo
+Dockerfile
+.dockerignore

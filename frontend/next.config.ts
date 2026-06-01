@@ -5,6 +5,8 @@ import type { NextConfig } from "next";
 const api = new URL(process.env.API_BASE ?? "http://localhost:8000");
 
 const nextConfig: NextConfig = {
+  // Самодостаточный сервер для Docker (.next/standalone + server.js).
+  output: "standalone",
   images: {
     // Оптимизатор Next сам отдаёт WebP (по Accept), ресайзит под `sizes`
     // и кэширует варианты — и для статики из public/, и для удалённых
