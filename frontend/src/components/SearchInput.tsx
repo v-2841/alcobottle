@@ -45,8 +45,23 @@ export function SearchInput({
     };
   }, [open]);
 
+  // Актуальный current для отложенного push + чистим таймер на размонтировании,
+  // чтобы «протухший» debounce не перезатёр свежую навигацию (напр. выбор категории).
+  const currentRef = useRef(current);
+  useEffect(() => {
+    currentRef.current = current;
+  }, [current]);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+
   function push(next: string) {
-    router.push(buildCatalogHref(current, { search: next.trim() || undefined }));
+    router.push(
+      buildCatalogHref(currentRef.current, { search: next.trim() || undefined }),
+    );
   }
   function onChange(v: string) {
     setValue(v);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { goodsQueryToString } from "@/lib/query";
 import type {
   Category,
@@ -52,34 +52,41 @@ export function CatalogContent({
     return res.json();
   }
 
+  // Игнорируем ответы устаревших запросов: применяем только результат последнего.
+  const reqId = useRef(0);
+
   async function changeSort(next: Sort) {
     if (next === sort) return;
     setSort(next);
     setLoading(true);
     setError(false);
+    const id = ++reqId.current;
     try {
       const data = await fetchPage(1, next);
+      if (id !== reqId.current) return;
       setItems(data.results);
       setCount(data.count);
       setPage(1);
     } catch {
-      setError(true);
+      if (id === reqId.current) setError(true);
     } finally {
-      setLoading(false);
+      if (id === reqId.current) setLoading(false);
     }
   }
 
   async function loadMore() {
     setLoading(true);
     setError(false);
+    const id = ++reqId.current;
     try {
       const data = await fetchPage(page + 1, sort);
+      if (id !== reqId.current) return;
       setItems((prev) => [...prev, ...data.results]);
       setPage((p) => p + 1);
     } catch {
-      setError(true);
+      if (id === reqId.current) setError(true);
     } finally {
-      setLoading(false);
+      if (id === reqId.current) setLoading(false);
     }
   }
 
