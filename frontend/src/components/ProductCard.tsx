@@ -27,7 +27,7 @@ export function ProductCard({ good }: { good: Good }) {
   }
 
   return (
-    <article className="group flex flex-col gap-3 rounded-[16px] bg-sand/20 p-2 md:rounded-[20px] md:p-3">
+    <article className="group flex flex-col gap-3 rounded-[16px] bg-sand/20 p-2 [contain:layout_paint_style] md:rounded-[20px] md:p-3">
       <div className="relative aspect-square overflow-hidden rounded-xl bg-cream-50 md:rounded-2xl">
         <Link
           href={href}
@@ -54,7 +54,7 @@ export function ProductCard({ good }: { good: Good }) {
           href={href}
           onClick={openModal}
           aria-label={`Информация о товаре ${good.name}`}
-          className="absolute right-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-cream/80 text-wine backdrop-blur transition-colors hover:bg-wine hover:text-cream md:size-8"
+          className="absolute right-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-cream/90 text-wine transition-colors hover:bg-wine hover:text-cream md:size-8 md:bg-cream/80 md:backdrop-blur"
         >
           <InfoIcon className="size-4 md:size-5" />
         </Link>
@@ -67,7 +67,7 @@ export function ProductCard({ good }: { good: Good }) {
           </Link>
         </h3>
 
-        <dl className="flex flex-col gap-1 text-[11px] md:text-sm">
+        <dl className="flex flex-col gap-1 text-[12px] md:text-sm">
           <div className="flex flex-wrap gap-x-1.5">
             <dt className="text-ink">Категория:</dt>
             <dd>
