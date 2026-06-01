@@ -9,7 +9,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-# API_BASE нужен на сборке: из него выводится images.remotePatterns.
+# API_BASE нужен на сборке: из него выводятся rewrites для /media.
 ARG API_BASE=http://backend:8000
 ENV API_BASE=$API_BASE
 
