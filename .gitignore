@@ -1,8 +1,29 @@
+# Editors / OS
 .vscode/
-.env
+.idea/
+.DS_Store
 
-# Backend
+# Env (секреты не коммитим, .env.example — можно)
+.env
+.env.local
+.env.*.local
+
+# ── Backend (Python / Django) ──
 .venv/
 __pycache__/
-backend/data
-backend/media
+*.py[cod]
+backend/data/
+backend/media/
+backend/static/
+
+# ── Frontend (Node / Next.js) ──
+node_modules/
+.pnpm-store/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+*-debug.log*
