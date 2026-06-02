@@ -10,13 +10,13 @@ from goods.models import Category, Good, Manufacturer
 
 
 class CategoryViewSet(mixins.ListModelMixin, GenericViewSet):
-    queryset = Category.objects.all()
+    queryset = Category.objects.filter(goods__active=True).distinct()
     serializer_class = CategorySerializer
     pagination_class = None
 
 
 class ManufacturerViewSet(mixins.ListModelMixin, GenericViewSet):
-    queryset = Manufacturer.objects.all()
+    queryset = Manufacturer.objects.filter(goods__active=True).distinct()
     serializer_class = ManufacturerSerializer
     pagination_class = None
 
