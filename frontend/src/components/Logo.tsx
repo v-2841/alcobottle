@@ -1,12 +1,25 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 
 /** Логотип из макета: иконка-бутылка + надпись «alcobottle» (градиент cream→sand). */
 export function Logo({ className = "" }: { className?: string }) {
+  function resetCatalog(e: React.MouseEvent<HTMLAnchorElement>) {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+      return;
+    }
+    window.dispatchEvent(new Event("alcobottle:catalog-reset"));
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
   return (
     <Link
       href="/"
       aria-label="Alcobottle — на главную"
+      onClick={resetCatalog}
       className={`inline-flex items-center gap-1.5 select-none ${className}`}
     >
       <Image

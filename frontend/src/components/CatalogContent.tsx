@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { goodsQueryToString } from "@/lib/query";
 import type {
   Category,
@@ -39,9 +39,26 @@ export function CatalogContent({
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const hasMore = items.length < count;
+
+  // Игнорируем ответы устаревших запросов: применяем только результат последнего.
+  const reqId = useRef(0);
+
+  const resetCatalogState = useCallback(() => {
+    reqId.current += 1;
+    setSort("price");
+    setItems(initial);
+    setCount(totalCount);
+    setPage(1);
+    setLoading(false);
+    setError(false);
+  }, [initial, totalCount]);
 
   // Сервер сортирует ВСЕ товары и пагинирует; "price" — дефолт бэка (без параметра).
-  async function fetchPage(nextPage: number, ord: Sort): Promise<Paginated<Good>> {
+  const fetchPage = useCallback(async (
+    nextPage: number,
+    ord: Sort,
+  ): Promise<Paginated<Good>> => {
     const qs = goodsQueryToString({
       ...current,
       ordering: ord === "price" ? undefined : ord,
@@ -50,10 +67,14 @@ export function CatalogContent({
     const res = await fetch(`/catalog-data?${qs}`);
     if (!res.ok) throw new Error("load failed");
     return res.json();
-  }
+  }, [current]);
 
-  // Игнорируем ответы устаревших запросов: применяем только результат последнего.
-  const reqId = useRef(0);
+  useEffect(() => {
+    window.addEventListener("alcobottle:catalog-reset", resetCatalogState);
+    return () => {
+      window.removeEventListener("alcobottle:catalog-reset", resetCatalogState);
+    };
+  }, [resetCatalogState]);
 
   async function changeSort(next: Sort) {
     if (next === sort) return;
@@ -74,7 +95,8 @@ export function CatalogContent({
     }
   }
 
-  async function loadMore() {
+  const loadMore = useCallback(async (force = false) => {
+    if (loading || (!force && error) || !hasMore) return;
     setLoading(true);
     setError(false);
     const id = ++reqId.current;
@@ -88,7 +110,24 @@ export function CatalogContent({
     } finally {
       if (id === reqId.current) setLoading(false);
     }
-  }
+  }, [error, fetchPage, hasMore, loading, page, sort]);
+
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore || loading || error) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMore();
+      },
+      { rootMargin: "800px 0px" },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, loading, error, loadMore]);
 
   return (
     <ProductModalProvider
@@ -112,7 +151,8 @@ export function CatalogContent({
           count={count}
           loading={loading}
           error={error}
-          onLoadMore={loadMore}
+          sentinelRef={sentinelRef}
+          onRetry={() => void loadMore(true)}
         />
       </div>
     </ProductModalProvider>

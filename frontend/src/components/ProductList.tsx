@@ -1,5 +1,6 @@
 "use client";
 
+import type { RefObject } from "react";
 import type { Good } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 
@@ -8,13 +9,15 @@ export function ProductList({
   count,
   loading,
   error,
-  onLoadMore,
+  sentinelRef,
+  onRetry,
 }: {
   items: Good[];
   count: number;
   loading: boolean;
   error: boolean;
-  onLoadMore: () => void;
+  sentinelRef: RefObject<HTMLDivElement | null>;
+  onRetry: () => void;
 }) {
   const hasMore = items.length < count;
 
@@ -34,14 +37,25 @@ export function ProductList({
         ))}
       </div>
 
-      {hasMore && (
+      {hasMore && !error && (
+        <div
+          ref={sentinelRef}
+          aria-hidden="true"
+          className="h-10 w-full"
+        />
+      )}
+
+      {loading && (
+        <p className="text-sm text-ink/40">Загрузка…</p>
+      )}
+
+      {error && hasMore && (
         <button
           type="button"
-          onClick={onLoadMore}
-          disabled={loading}
+          onClick={onRetry}
           className="rounded-xl bg-cta-gradient px-8 py-2.5 text-base text-ink shadow-sm transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {loading ? "Загрузка…" : "Показать ещё"}
+          Повторить
         </button>
       )}
 
