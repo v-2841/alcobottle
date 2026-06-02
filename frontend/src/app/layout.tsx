@@ -32,6 +32,14 @@ export default function RootLayout({
   return (
     <html lang="ru" className={inter.variable}>
       <body className="min-h-screen bg-cream text-ink">
+        <Script
+          id="scroll-restoration"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html:
+              "if ('scrollRestoration' in history) history.scrollRestoration = 'manual';",
+          }}
+        />
         {children}
         <AgeGate />
         {/* Чат Jivo — грузим в простое браузера (реком. next/script для чат-виджетов) */}

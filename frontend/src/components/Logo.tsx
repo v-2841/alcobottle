@@ -9,10 +9,8 @@ export function Logo({ className = "" }: { className?: string }) {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
       return;
     }
+    window.scrollTo(0, 0);
     window.dispatchEvent(new Event("alcobottle:catalog-reset"));
-    window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
   }
 
   return (
