@@ -25,10 +25,12 @@ export function ProductModalProvider({
   children,
   initialProduct = null,
   initialCloseHref,
+  siteUrl,
 }: {
   children: React.ReactNode;
   initialProduct?: Good | null;
   initialCloseHref?: string;
+  siteUrl: string;
 }) {
   const router = useRouter();
   const [good, setGood] = useState<Good | null>(initialProduct);
@@ -76,8 +78,46 @@ export function ProductModalProvider({
     };
   }, [good]);
 
+  const jsonLd = good
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: good.name,
+        description: good.description || good.seo_description,
+        ...(good.image
+          ? { image: new URL(good.image, siteUrl).toString() }
+          : {}),
+        sku: String(good.id),
+        category: good.category.name,
+        manufacturer: {
+          "@type": "Organization",
+          name: good.manufacturer.name,
+        },
+        offers: {
+          "@type": "Offer",
+          url: `${siteUrl}/${encodeURIComponent(good.slug)}`,
+          price: good.price,
+          priceCurrency: "RUB",
+          availability:
+            good.stock > 0
+              ? "https://schema.org/InStock"
+              : "https://schema.org/OutOfStock",
+          itemCondition: "https://schema.org/NewCondition",
+        },
+      }
+    : null;
+
   return (
     <ModalCtx.Provider value={{ open }}>
+      {jsonLd && (
+        <script
+          id="product-json-ld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
       {children}
       {good && <ProductModal good={good} onClose={close} />}
     </ModalCtx.Provider>

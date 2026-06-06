@@ -23,6 +23,7 @@ export function CatalogContent({
   manufacturers,
   initialProduct = null,
   initialCloseHref,
+  siteUrl,
 }: {
   initial: Good[];
   totalCount: number;
@@ -31,6 +32,7 @@ export function CatalogContent({
   manufacturers: Manufacturer[];
   initialProduct?: Good | null;
   initialCloseHref?: string;
+  siteUrl: string;
 }) {
   // Сортировка — клиентский стейт (в URL не пишется), но сортирует сервер.
   const [sort, setSort] = useState<Sort>("price");
@@ -133,6 +135,7 @@ export function CatalogContent({
     <ProductModalProvider
       initialProduct={initialProduct}
       initialCloseHref={initialCloseHref}
+      siteUrl={siteUrl}
     >
       <div className="mt-6 flex flex-col gap-4">
         <FilterBar

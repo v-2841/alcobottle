@@ -1,5 +1,6 @@
 import { getCategories, getGoods, getManufacturers } from "@/lib/api";
 import { goodsQueryToString } from "@/lib/query";
+import { SITE_URL } from "@/lib/site";
 import type { Good, GoodsQuery } from "@/lib/types";
 import { Banner } from "./Banner";
 import { CatalogContent } from "./CatalogContent";
@@ -39,6 +40,7 @@ export async function Catalog({
           manufacturers={manufacturers}
           initialProduct={initialProduct}
           initialCloseHref={initialCloseHref}
+          siteUrl={SITE_URL}
         />
       </main>
 
