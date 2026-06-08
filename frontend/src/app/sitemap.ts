@@ -17,12 +17,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const products: MetadataRoute.Sitemap = slugs.map((slug) => ({
     url: `${SITE_URL}/${slug}`,
-    changeFrequency: "weekly",
     priority: 0.8,
   }));
 
-  return [
-    { url: SITE_URL, changeFrequency: "daily", priority: 1 },
-    ...products,
-  ];
+  return [{ url: SITE_URL, priority: 1 }, ...products];
 }
