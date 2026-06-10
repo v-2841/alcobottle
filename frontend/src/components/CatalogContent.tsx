@@ -18,6 +18,8 @@ import { ProductModalProvider } from "./ProductModalProvider";
 export function CatalogContent({
   initial,
   totalCount,
+  initialPage,
+  initialHasNext,
   current,
   categories,
   manufacturers,
@@ -27,6 +29,8 @@ export function CatalogContent({
 }: {
   initial: Good[];
   totalCount: number;
+  initialPage: number;
+  initialHasNext: boolean;
   current: GoodsQuery;
   categories: Category[];
   manufacturers: Manufacturer[];
@@ -38,10 +42,11 @@ export function CatalogContent({
   const [sort, setSort] = useState<Sort>("price");
   const [items, setItems] = useState<Good[]>(initial);
   const [count, setCount] = useState(totalCount);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initialPage);
+  const [hasNext, setHasNext] = useState(initialHasNext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const hasMore = items.length < count;
+  const hasMore = hasNext;
 
   // Игнорируем ответы устаревших запросов: применяем только результат последнего.
   const reqId = useRef(0);
@@ -51,10 +56,11 @@ export function CatalogContent({
     setSort("price");
     setItems(initial);
     setCount(totalCount);
-    setPage(1);
+    setPage(initialPage);
+    setHasNext(initialHasNext);
     setLoading(false);
     setError(false);
-  }, [initial, totalCount]);
+  }, [initial, initialHasNext, initialPage, totalCount]);
 
   // Сервер сортирует ВСЕ товары и пагинирует; "price" — дефолт бэка (без параметра).
   const fetchPage = useCallback(async (
@@ -90,6 +96,7 @@ export function CatalogContent({
       setItems(data.results);
       setCount(data.count);
       setPage(1);
+      setHasNext(data.next !== null);
     } catch {
       if (id === reqId.current) setError(true);
     } finally {
@@ -107,6 +114,7 @@ export function CatalogContent({
       if (id !== reqId.current) return;
       setItems((prev) => [...prev, ...data.results]);
       setPage((p) => p + 1);
+      setHasNext(data.next !== null);
     } catch {
       if (id === reqId.current) setError(true);
     } finally {
@@ -152,6 +160,9 @@ export function CatalogContent({
         <ProductList
           items={items}
           count={count}
+          current={current}
+          page={page}
+          hasMore={hasMore}
           loading={loading}
           error={error}
           sentinelRef={sentinelRef}

@@ -1,12 +1,22 @@
 "use client";
 
+import Link from "next/link";
 import type { RefObject } from "react";
-import type { Good } from "@/lib/types";
+import { goodsQueryToString } from "@/lib/query";
+import type { Good, GoodsQuery } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
+
+function pageHref(current: GoodsQuery, page: number): string {
+  const qs = goodsQueryToString({ ...current, page });
+  return qs ? `/?${qs}` : "/";
+}
 
 export function ProductList({
   items,
   count,
+  current,
+  page,
+  hasMore,
   loading,
   error,
   sentinelRef,
@@ -14,13 +24,14 @@ export function ProductList({
 }: {
   items: Good[];
   count: number;
+  current: GoodsQuery;
+  page: number;
+  hasMore: boolean;
   loading: boolean;
   error: boolean;
   sentinelRef: RefObject<HTMLDivElement | null>;
   onRetry: () => void;
 }) {
-  const hasMore = items.length < count;
-
   if (items.length === 0) {
     return (
       <div className="py-20 text-center text-ink/50">
@@ -64,6 +75,25 @@ export function ProductList({
           Не удалось загрузить. Попробуйте ещё раз.
         </p>
       )}
+
+      <nav aria-label="Страницы каталога" className="flex gap-4 text-sm">
+        {page > 1 && (
+          <Link
+            href={pageHref(current, page - 1)}
+            className="font-medium text-wine hover:underline"
+          >
+            Предыдущая страница
+          </Link>
+        )}
+        {hasMore && (
+          <Link
+            href={pageHref(current, page + 1)}
+            className="font-medium text-wine hover:underline"
+          >
+            Следующая страница
+          </Link>
+        )}
+      </nav>
 
       <p className="text-xs text-ink/40">
         Показано {items.length} из {count}

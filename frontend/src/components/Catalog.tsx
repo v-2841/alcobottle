@@ -17,7 +17,7 @@ export async function Catalog({
   initialCloseHref?: string;
 }) {
   const [goodsPage, categories, manufacturers] = await Promise.all([
-    getGoods({ ...query, page: 1 }),
+    getGoods(query),
     getCategories(),
     getManufacturers(),
   ]);
@@ -35,6 +35,8 @@ export async function Catalog({
           key={goodsQueryToString(query) || "all"}
           initial={goodsPage.results}
           totalCount={goodsPage.count}
+          initialPage={query.page ?? 1}
+          initialHasNext={goodsPage.next !== null}
           current={query}
           categories={categories}
           manufacturers={manufacturers}

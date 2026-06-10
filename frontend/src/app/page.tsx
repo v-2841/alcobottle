@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Catalog } from "@/components/Catalog";
-import { parseGoodsQuery, type RawSearchParams } from "@/lib/query";
+import {
+  goodsQueryToString,
+  parseGoodsQuery,
+  type RawSearchParams,
+} from "@/lib/query";
 
 type Props = { searchParams: Promise<RawSearchParams> };
 
@@ -15,12 +19,17 @@ export async function generateMetadata({
   if (q.manufacturer) parts.push(q.manufacturer);
   if (q.search) parts.push(`Поиск «${q.search}»`);
 
-  if (parts.length === 0) return {};
+  const canonicalQuery = goodsQueryToString(q);
+  const canonical = canonicalQuery ? `/?${canonicalQuery}` : "/";
+  if (parts.length === 0) {
+    return { alternates: { canonical } };
+  }
 
   const title = parts.join(" · ");
   return {
     title,
     description: `${title} — каталог премиального алкоголя Alcobottle. Доставка по Москве и области.`,
+    alternates: { canonical },
   };
 }
 
