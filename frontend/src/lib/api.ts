@@ -38,13 +38,20 @@ export function getGoods(query: GoodsQuery = {}): Promise<Paginated<Good>> {
   return apiGet<Paginated<Good>>(`/api/goods/${buildGoodsParams(query)}`, false);
 }
 
-/** Товар по слагу. */
+/**
+ * Товар по слагу. null — только если товара действительно нет (404).
+ * Любая другая ошибка пробрасывается: иначе упавший бэкенд превращается
+ * в 404 для поисковика, и живой товар выпадает из индекса.
+ */
 export async function getGood(slug: string): Promise<Good | null> {
-  try {
-    return await apiGet<Good>(`/api/goods/${encodeURIComponent(slug)}/`, 300);
-  } catch {
-    return null;
-  }
+  const path = `/api/goods/${encodeURIComponent(slug)}/`;
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: { Accept: "application/json" },
+    next: { revalidate: 300 },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`API ${path} → ${res.status}`);
+  return res.json() as Promise<Good>;
 }
 
 /** Слаги всех активных товаров (для sitemap). Идём по страницам, пока есть next. */

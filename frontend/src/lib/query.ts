@@ -1,4 +1,6 @@
-import type { GoodsQuery } from "./types";
+import type { GoodsQuery, Sort } from "./types";
+
+const SORTS: readonly Sort[] = ["price", "-price", "name", "-name"];
 
 export type RawSearchParams = Record<string, string | string[] | undefined>;
 
@@ -9,11 +11,14 @@ function first(value: string | string[] | undefined): string | undefined {
 /** Разбор searchParams страницы в типизированный запрос к API. */
 export function parseGoodsQuery(sp: RawSearchParams): GoodsQuery {
   const pageNum = Number(first(sp.page));
+  const ordering = first(sp.ordering);
   return {
     page: Number.isFinite(pageNum) && pageNum > 1 ? pageNum : 1,
     search: first(sp.search)?.trim() || undefined,
     category: first(sp.category) || undefined,
     manufacturer: first(sp.manufacturer) || undefined,
+    // Значения вне списка допустимых игнорируем: мусор из URL не уедет в API.
+    ordering: SORTS.includes(ordering as Sort) ? (ordering as Sort) : undefined,
   };
 }
 
@@ -35,7 +40,8 @@ type QueryUpdates = Partial<Record<keyof GoodsQuery, string | undefined>>;
 
 /**
  * Ссылка на каталог (главную) с применёнными фильтрами.
- * Сортировка (ordering) в URL НЕ попадает; пагинация сбрасывается на 1-ю.
+ * Сортировка сохраняется — иначе она молча слетала при смене фильтра.
+ * Пагинация сбрасывается на первую страницу.
  */
 export function buildCatalogHref(
   current: GoodsQuery,
@@ -45,7 +51,6 @@ export function buildCatalogHref(
     ...current,
     ...updates,
     page: undefined,
-    ordering: undefined,
   } as GoodsQuery;
   const qs = goodsQueryToString(merged);
   return qs ? `/?${qs}` : "/";

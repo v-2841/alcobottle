@@ -108,7 +108,7 @@ export function SearchInput({
       </button>
 
       {open && (
-        <div className="absolute left-1/2 top-full z-40 mt-2 w-52 -translate-x-1/2 rounded-xl border border-rose bg-blush p-2 shadow-xl">
+        <div className="fixed inset-x-4 top-14 z-40 rounded-xl border border-rose bg-blush p-2 shadow-xl">
           <form onSubmit={onSubmit} className="relative flex items-center">
             <SearchIcon className="pointer-events-none absolute left-2.5 size-4 text-ink/40" />
             <input

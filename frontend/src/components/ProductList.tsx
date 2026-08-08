@@ -15,7 +15,8 @@ export function ProductList({
   items,
   count,
   current,
-  page,
+  basePage,
+  nextPage,
   hasMore,
   loading,
   error,
@@ -25,7 +26,10 @@ export function ProductList({
   items: Good[];
   count: number;
   current: GoodsQuery;
-  page: number;
+  /** Номер страницы из адреса — от него считается ссылка «назад». */
+  basePage: number;
+  /** Первая ещё не загруженная страница — на неё ведёт ссылка «вперёд». */
+  nextPage: number;
   hasMore: boolean;
   loading: boolean;
   error: boolean;
@@ -77,9 +81,9 @@ export function ProductList({
       )}
 
       <nav aria-label="Страницы каталога" className="flex gap-4 text-sm">
-        {page > 1 && (
+        {basePage > 1 && (
           <Link
-            href={pageHref(current, page - 1)}
+            href={pageHref(current, basePage - 1)}
             className="font-medium text-wine hover:underline"
           >
             Предыдущая страница
@@ -87,7 +91,7 @@ export function ProductList({
         )}
         {hasMore && (
           <Link
-            href={pageHref(current, page + 1)}
+            href={pageHref(current, nextPage)}
             className="font-medium text-wine hover:underline"
           >
             Следующая страница

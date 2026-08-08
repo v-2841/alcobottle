@@ -38,11 +38,13 @@ export function CatalogContent({
   initialCloseHref?: string;
   siteUrl: string;
 }) {
-  // Сортировка — клиентский стейт (в URL не пишется), но сортирует сервер.
-  const [sort, setSort] = useState<Sort>("price");
+  // Сортировка живёт в URL, поэтому переживает смену фильтров.
+  const sort: Sort = current.ordering ?? "price";
   const [items, setItems] = useState<Good[]>(initial);
   const [count, setCount] = useState(totalCount);
-  const [page, setPage] = useState(initialPage);
+  // Последняя ЗАГРУЖЕННАЯ страница. Это НЕ номер страницы из адреса:
+  // автоподгрузка увеличивает его, не меняя URL.
+  const [loadedPage, setLoadedPage] = useState(initialPage);
   const [hasNext, setHasNext] = useState(initialHasNext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -53,10 +55,9 @@ export function CatalogContent({
 
   const resetCatalogState = useCallback(() => {
     reqId.current += 1;
-    setSort("price");
     setItems(initial);
     setCount(totalCount);
-    setPage(initialPage);
+    setLoadedPage(initialPage);
     setHasNext(initialHasNext);
     setLoading(false);
     setError(false);
@@ -65,17 +66,16 @@ export function CatalogContent({
   // Сервер сортирует ВСЕ товары и пагинирует; "price" — дефолт бэка (без параметра).
   const fetchPage = useCallback(async (
     nextPage: number,
-    ord: Sort,
   ): Promise<Paginated<Good>> => {
     const qs = goodsQueryToString({
       ...current,
-      ordering: ord === "price" ? undefined : ord,
+      ordering: sort === "price" ? undefined : sort,
       page: nextPage,
     });
     const res = await fetch(`/catalog-data?${qs}`);
     if (!res.ok) throw new Error("load failed");
     return res.json();
-  }, [current]);
+  }, [current, sort]);
 
   useEffect(() => {
     window.addEventListener("alcobottle:catalog-reset", resetCatalogState);
@@ -84,43 +84,23 @@ export function CatalogContent({
     };
   }, [resetCatalogState]);
 
-  async function changeSort(next: Sort) {
-    if (next === sort) return;
-    setSort(next);
-    setLoading(true);
-    setError(false);
-    const id = ++reqId.current;
-    try {
-      const data = await fetchPage(1, next);
-      if (id !== reqId.current) return;
-      setItems(data.results);
-      setCount(data.count);
-      setPage(1);
-      setHasNext(data.next !== null);
-    } catch {
-      if (id === reqId.current) setError(true);
-    } finally {
-      if (id === reqId.current) setLoading(false);
-    }
-  }
-
   const loadMore = useCallback(async (force = false) => {
     if (loading || (!force && error) || !hasMore) return;
     setLoading(true);
     setError(false);
     const id = ++reqId.current;
     try {
-      const data = await fetchPage(page + 1, sort);
+      const data = await fetchPage(loadedPage + 1);
       if (id !== reqId.current) return;
       setItems((prev) => [...prev, ...data.results]);
-      setPage((p) => p + 1);
+      setLoadedPage((p) => p + 1);
       setHasNext(data.next !== null);
     } catch {
       if (id === reqId.current) setError(true);
     } finally {
       if (id === reqId.current) setLoading(false);
     }
-  }, [error, fetchPage, hasMore, loading, page, sort]);
+  }, [error, fetchPage, hasMore, loadedPage, loading]);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -132,7 +112,9 @@ export function CatalogContent({
       ([entry]) => {
         if (entry.isIntersecting) loadMore();
       },
-      { rootMargin: "800px 0px" },
+      // 800px при 12 товарах на страницу срабатывали ещё до того, как
+      // предыдущая порция уходила из зоны видимости — каталог грузился каскадом.
+      { rootMargin: "200px 0px" },
     );
 
     observer.observe(node);
@@ -150,8 +132,6 @@ export function CatalogContent({
           categories={categories.map((c) => c.name)}
           manufacturers={manufacturers.map((m) => m.name)}
           current={current}
-          sort={sort}
-          onSortChange={changeSort}
         />
         <Chips current={current} />
       </div>
@@ -161,7 +141,8 @@ export function CatalogContent({
           items={items}
           count={count}
           current={current}
-          page={page}
+          basePage={current.page ?? 1}
+          nextPage={loadedPage + 1}
           hasMore={hasMore}
           loading={loading}
           error={error}

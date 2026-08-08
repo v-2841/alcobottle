@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { buildCatalogHref } from "@/lib/query";
-import type { GoodsQuery, Sort } from "@/lib/types";
+import type { GoodsQuery } from "@/lib/types";
 import { Dropdown, type Option } from "./Dropdown";
 import { FilterIcon, SortIcon } from "./icons";
 import { MobileFilters } from "./MobileFilters";
@@ -18,14 +18,10 @@ export function FilterBar({
   categories,
   manufacturers,
   current,
-  sort,
-  onSortChange,
 }: {
   categories: string[];
   manufacturers: string[];
   current: GoodsQuery;
-  sort: Sort;
-  onSortChange: (sort: Sort) => void;
 }) {
   const router = useRouter();
   const go = (updates: Partial<Record<keyof GoodsQuery, string | undefined>>) =>
@@ -42,14 +38,14 @@ export function FilterBar({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      {/* Сортировка — клиентская (в URL не пишется) */}
+      {/* Сортировка живёт в URL: переживает смену фильтров и шарится ссылкой */}
       <Dropdown
         icon={<SortIcon className="size-4" />}
         options={SORT_OPTIONS}
-        selected={sort}
+        selected={current.ordering ?? "price"}
         active={false}
         compact
-        onSelect={(v) => onSortChange((v ?? "price") as Sort)}
+        onSelect={(v) => go({ ordering: !v || v === "price" ? undefined : v })}
       />
 
       {/* Десктоп: два отдельных дропдауна */}

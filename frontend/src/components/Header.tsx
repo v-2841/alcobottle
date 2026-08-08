@@ -13,7 +13,7 @@ function Geo({ className = "" }: { className?: string }) {
     >
       <GeoIcon className="size-5 shrink-0 text-sand" />
       <span className="w-max text-right text-[11px] italic leading-tight text-sand md:text-left md:text-xs">
-        Заказы по Москве<br className="md:hidden" /> и области
+        Москва<br className="md:hidden" /> и область
       </span>
     </span>
   );
@@ -22,22 +22,22 @@ function Geo({ className = "" }: { className?: string }) {
 export function Header({ current }: { current: GoodsQuery }) {
   return (
     <header className="sticky top-0 z-30 bg-wine-gradient">
-      <div className="relative mx-auto grid h-14 max-w-[1200px] grid-cols-[max-content_minmax(0,1fr)_max-content] items-center gap-3 px-5 md:flex md:h-[52px] md:justify-between md:gap-3 md:px-10">
-        <Logo className="shrink-0 justify-self-start" />
+      <div className="relative mx-auto flex h-14 max-w-[1200px] items-center justify-between gap-3 px-5 md:h-[52px] md:px-10">
+        <Logo className="shrink-0" />
 
         {/* десктоп: поиск + гео вместе у правого края */}
-        <div className="hidden items-center gap-6 md:order-last md:flex">
+        <div className="hidden items-center gap-6 md:flex">
           <SearchInput current={current} variant="desk" />
           <Geo />
         </div>
 
-        {/* мобайл: поиск по центру */}
-        <div className="justify-self-center md:hidden">
+        {/* мобайл: поиск между логотипом и гео */}
+        <div className="md:hidden">
           <SearchInput current={current} variant="mob" />
         </div>
 
         {/* мобайл: гео справа, ширина по тексту, иконка вплотную к тексту */}
-        <Geo className="justify-self-end md:hidden" />
+        <Geo className="md:hidden" />
       </div>
     </header>
   );
