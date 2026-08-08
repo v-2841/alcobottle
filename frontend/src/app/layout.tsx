@@ -15,12 +15,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Alcobottle — премиальный алкоголь с доставкой",
+    default: "Alcobottle — каталог премиального алкоголя",
     template: "%s — Alcobottle",
   },
   description:
-    "Каталог премиального алкоголя Alcobottle: виски, коньяк и шампанское. " +
-    "Подбор по категориям и производителям, доставка по Москве и области.",
+    "Каталог премиального алкоголя Alcobottle: виски, коньяк и шампанское. "
+    + "Характеристики, объём, дегустационные заметки и справочные цены.",
 };
 
 export default function RootLayout({

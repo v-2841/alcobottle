@@ -9,10 +9,13 @@ import { Header } from "./Header";
 
 export async function Catalog({
   query,
+  heading = null,
   initialProduct = null,
   initialCloseHref,
 }: {
   query: GoodsQuery;
+  /** Заголовок страницы. На карточке товара — null: там <h1> даёт сам товар. */
+  heading?: string | null;
   initialProduct?: Good | null;
   initialCloseHref?: string;
 }) {
@@ -30,6 +33,10 @@ export async function Catalog({
         <div className="pt-4 md:pt-6">
           <Banner />
         </div>
+
+        {/* Заголовок нужен поисковикам и скринридерам, но в макете его нет:
+            держим в разметке, скрывая визуально. */}
+        {heading && <h1 className="sr-only">{heading}</h1>}
 
         <CatalogContent
           key={goodsQueryToString(query) || "all"}

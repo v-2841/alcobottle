@@ -47,7 +47,8 @@ export function ProductModal({
           </button>
 
           <div className="flex max-h-[80vh] flex-col gap-4 overflow-y-auto pr-1">
-            <h2 className="pr-8 text-2xl font-extrabold text-wine">{good.name}</h2>
+            {/* Заголовок уровня h1: на /{slug} это главный заголовок страницы */}
+            <h1 className="pr-8 text-2xl font-extrabold text-wine">{good.name}</h1>
 
             {good.description && (
               <p className="text-sm leading-relaxed text-ink">
