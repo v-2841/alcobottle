@@ -1,9 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins
-from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.filters import SearchFilter
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
-from api.filters import GoodFilter
+from api.filters import GoodFilter, StableOrderingFilter
 from api.serializers import (CategorySerializer, GoodSerializer,
                              ManufacturerSerializer)
 from goods.models import Category, Good, Manufacturer
@@ -28,7 +28,7 @@ class GoodViewSet(ReadOnlyModelViewSet):
     )
     serializer_class = GoodSerializer
     lookup_field = 'slug'
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, StableOrderingFilter]
     filterset_class = GoodFilter
     search_fields = ['name']
     ordering_fields = ['price', 'name']
